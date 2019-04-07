@@ -7,6 +7,7 @@ enum
     ARG_TYPE_EMPTY,
     ARG_TYPE_NORMAL,
     ARG_TYPE_OPTION,
+    ARG_TYPE_OPTION_L,
     ARG_TYPE_END
 };
 
@@ -27,9 +28,14 @@ int get_arg_type(const char *arg)
     if (arg[0] == '-' && arg[1])
     {
         // -- terminates
-        if (arg[1] == '-' && !arg[2])
+        if (arg[1] == '-')
         {
-            return ARG_TYPE_END;
+            if (!arg[2])
+            {
+                return ARG_TYPE_END;
+            }
+
+            return ARG_TYPE_OPTION_L;
         }
 
         // -X
@@ -175,6 +181,10 @@ int adopt_parse(
             {
                 ADOPT_RETURN(result, ADOPT_RESULT_ARGUMENT, NULL, a, state->idx++, 1);
             }
+
+            case ARG_TYPE_OPTION_L:
+                a++; // Skip -
+                     // FALLTHROUGH
 
             case ARG_TYPE_OPTION:
             {
